@@ -1,0 +1,67 @@
+
+# ExtraStorage.sol — 知识点与写法小结
+
+## 1. 关键知识点一览
+
+| # | 概念 / 语法                 | 代码片段                                   | 要点说明 |
+|---|-----------------------------|--------------------------------------------|-----------|
+| 1 | **import**                 | `import "./SimpleStorage.sol";`            | 把父合约代码引入当前文件，便于继承或调用。 |
+| 2 | **继承** (`is`)            | `contract ExtraStorage is SimpleStorage`   | ExtraStorage 获得 SimpleStorage 的所有状态变量和未重写函数。 |
+| 3 | **函数重写** (`override`)  | `function store(...) public override`      | 覆盖父合约中同名、同参数的 `store` 函数。父函数必须标记 `virtual`。 |
+| 4 | **状态变量继承与访问**     | `favoriteNumber = ...`                     | 直接读/写父合约的 `favoriteNumber`（因其在父合约中为 `public` 或 `internal`）。 |
+| 5 | **业务逻辑扩展**           | `+ 5`                                      | 在原逻辑基础上加入自定义规则：存入值自动 +5。 |
+
+---
+
+## 2. 写法拆解
+
+1. **引入父合约**
+   ```solidity
+   import "./SimpleStorage.sol";
+   ```
+   - 让编译器加载 `SimpleStorage` 源码，才能在本文件里当作父类引用。
+
+2. **声明继承关系**
+   ```solidity
+   contract ExtraStorage is SimpleStorage
+   ```
+   - `ExtraStorage` 自动拥有：
+     - 父合约的状态变量 `favoriteNumber`
+     - `retrieve()` 等未被改写的方法
+
+3. **重写 `store` 函数**
+   ```solidity
+   function store(uint256 _favoriteNumber) public override {
+       favoriteNumber = _favoriteNumber + 5;
+   }
+   ```
+   - 必须与父函数 **签名一致**（名称和参数类型相同）。
+   - `override` 表示“我确定要替换父实现”。
+   - 新逻辑：把外部传入的数字加 5 后再写入。
+
+> ⚠️ 记得在 `SimpleStorage` 合约中将原 `store` 函数声明为 `virtual`：
+> ```solidity
+> function store(uint256 _favoriteNumber) public virtual { ... }
+> ```
+
+---
+
+## 3. 调用效果示例
+
+| 步骤 | 操作 | 结果 |
+|------|------|------|
+| ① 部署 `ExtraStorage` | — | `favoriteNumber` 初始为 0 |
+| ② `store(10)`        | 写入 | 实际存储 = `10 + 5 = 15` |
+| ③ `retrieve()`       | 读取 | 返回 `15` |
+
+---
+
+## 4. 适用场景
+
+*当你想在保持接口一致的同时，对父合约的部分行为做轻量级调整*：  
+- **权限变化**：子合约可加 `require(msg.sender == owner)` 等限制。  
+- **业务偏差**：如 NFT 定价加手续费、记账时追加利息等。  
+- **多层继承链**：进一步继承 `ExtraStorage`，再叠加新的偏移或逻辑。
+
+---
+ExtraStorage` 利用 **继承 + override** 两把钥匙，在不改动父合约接口的前提下，扩展了 `store` 的业务逻辑，为后续多样化实现提供了模板。
