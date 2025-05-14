@@ -1,41 +1,147 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MetaMask连接演示</title>
+    <title>MetaMask合约交互器</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
-        body { 
+        /* 原设计样式保留 */
+        body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
         }
-        #accountBox {
-            border: 1px solid #ddd;
-            padding: 20px;
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 32px;
+            width: 500px;
+        }
+
+        h1 {
+            color: #1c1e21;
+            font-size: 24px;
+            margin-bottom: 24px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: #f8f9fa;
             border-radius: 8px;
-            margin-bottom: 20px;
         }
-        button {
-            background: #2172E5;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+
+        /* 新增合约交互样式 */
+        .contract-section {
+            margin: 24px 0;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #bdc3c7;
             border-radius: 6px;
-            cursor: pointer;
+            width: 100%;
         }
-        button:hover {
-            background: #1A5BBA;
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .tx-history {
+            margin-top: 24px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .tx-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tx-table th, 
+        .tx-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tx-hash {
+            font-family: monospace;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>MetaMask连接演示</h1>
-    
-    <div id="accountBox">
-        <p>当前账户: <span id="account">未连接</span></p>
-        <p>网络ID: <span id="networkId">-</span></p>
-        <button id="connectButton">连接MetaMask</button>
+    <div class="container">
+        <h1>MetaMask合约交互器</h1>
+        
+        <!-- 状态显示 -->
+        <div class="info-row">
+            <span>当前账户</span>
+            <span id="accountAddress" style="color:#28a745">未连接</span>
+        </div>
+        <div class="info-row">
+            <span>网络ID</span>
+            <span id="networkId">-</span>
+        </div>
+
+        <!-- 合约交互 -->
+        <div class="contract-section">
+            <div class="input-group">
+                <input type="number" id="input1" placeholder="数字1">
+                <input type="number" id="input2" placeholder="数字2">
+            </div>
+            <div class="action-buttons">
+                <button onclick="calculate('add')">➕ 加</button>
+                <button onclick="calculate('sub')">➖ 减</button>
+                <button onclick="calculate('mul')">✖️ 乘</button>
+                <button onclick="calculate('div')">➗ 除</button>
+            </div>
+        </div>
+
+        <!-- 交易历史 -->
+        <div class="tx-history">
+            <table class="tx-table">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>操作</th>
+                        <th>数值1</th>
+                        <th>数值2</th>
+                        <th>结果</th>
+                        <th>交易哈希</th>
+                    </tr>
+                </thead>
+                <tbody id="txBody">
+                    <!-- 交易记录动态插入 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 连接按钮 -->
+        <button id="connectButton" style="margin-top:24px">连接MetaMask</button>
     </div>
 
     <script src="app.js"></script>
