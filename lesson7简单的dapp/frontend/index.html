@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MetaMask连接演示</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        #accountBox {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #2172E5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1A5BBA;
+        }
+    </style>
+</head>
+<body>
+    <h1>MetaMask连接演示</h1>
+    
+    <div id="accountBox">
+        <p>当前账户: <span id="account">未连接</span></p>
+        <p>网络ID: <span id="networkId">-</span></p>
+        <button id="connectButton">连接MetaMask</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
