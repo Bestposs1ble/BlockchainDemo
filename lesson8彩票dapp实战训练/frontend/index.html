@@ -2,50 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>FundMe DApp</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simple Wallet Connect</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 480px;
-      margin: 20px auto;
-      padding: 10px;
-      background-color: #f9f9f9;
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #f4f4f4;
       color: #333;
-      text-align: center;
     }
-    button {
-      cursor: pointer;
-      padding: 10px 20px;
+    button, input {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
       font-size: 16px;
-      border-radius: 4px;
-      border: none;
-      background-color: #4caf50;
-      color: white;
-      margin-top: 20px;
-    }
-    button:disabled {
-      background-color: #888;
-      cursor: not-allowed;
     }
     #status {
-      margin-top: 30px;
-      font-size: 18px;
-      font-weight: bold;
+      background: #eef;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      font-family: monospace;
     }
   </style>
 </head>
 <body>
 
-  <h1>Simple Wallet Connect</h1>
+  <h2>FundMe DApp</h2>
 
-  <button id="connectButton">Connect Wallet</button>
+  <button id="connectButton">🔌 Connect Wallet</button>
 
-  <div id="status">Wallet not connected</div>
+  <div id="status">Not connected</div>
+
+  <hr />
+
+  <input id="ethAmount" type="number" placeholder="Enter ETH amount" step="0.001" min="0" />
+  <button id="fundButton">💸 Fund</button>
+
+  <button id="withdrawButton">🏦 Withdraw</button>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-  <script src="app.js" type="application/javascript"></script>
+  <script src="app.js"></script>
 
 </body>
 </html>
