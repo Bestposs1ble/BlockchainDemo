@@ -129,42 +129,61 @@ const abi = [
     }
   ];
 
+  let provider, signer, contract;
+
   const connectBtn = document.getElementById("connectButton");
-const statusDiv = document.getElementById("status");
-
-let provider;
-let signer;
-
-async function connectWallet() {
-  if (!window.ethereum) {
-    statusDiv.textContent = "MetaMask not detected. Please install MetaMask!";
-    return;
-  }
-
-  try {
-    await window.ethereum.request({ method: "eth_requestAccounts" });
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = provider.getSigner();
-    const userAddress = await signer.getAddress();
-
-    statusDiv.textContent = `Wallet connected: ${userAddress}`;
-    connectBtn.disabled = true;
-  } catch (error) {
-    statusDiv.textContent = `Failed to connect wallet: ${error.message}`;
-  }
-}
-
-connectBtn.onclick = connectWallet;
-
-// 可选：监听账户切换，刷新页面或提示
-if (window.ethereum) {
-  window.ethereum.on("accountsChanged", (accounts) => {
-    if (accounts.length === 0) {
-      statusDiv.textContent = "Wallet disconnected. Please connect again.";
-      connectBtn.disabled = false;
+  const fundBtn = document.getElementById("fundButton");
+  const withdrawBtn = document.getElementById("withdrawButton");
+  const ethInput = document.getElementById("ethAmount");
+  const statusDiv = document.getElementById("status");
+  
+  connectBtn.onclick = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        contract = new ethers.Contract(contractAddress, abi, signer);
+  
+        const userAddress = await signer.getAddress();
+        const userBalance = await provider.getBalance(userAddress);
+        const contractBalance = await provider.getBalance(contractAddress);
+  
+        statusDiv.innerHTML =
+          `✅ Connected: ${userAddress}<br>` +
+          `💰 Your balance: ${ethers.utils.formatEther(userBalance)} ETH<br>` +
+          `📦 Contract balance: ${ethers.utils.formatEther(contractBalance)} ETH`;
+      } catch (error) {
+        statusDiv.textContent = "❌ Connection failed: " + error.message;
+      }
     } else {
-      statusDiv.textContent = `Wallet changed: ${accounts[0]}`;
-      connectBtn.disabled = true;
+      alert("Please install MetaMask");
     }
-  });
-}
+  };
+  
+  fundBtn.onclick = async () => {
+    if (!contract) return alert("Please connect your wallet first.");
+    const ethAmount = ethInput.value;
+    if (!ethAmount || Number(ethAmount) <= 0) return alert("Enter a valid ETH amount");
+  
+    try {
+      const tx = await contract.fund({ value: ethers.utils.parseEther(ethAmount) });
+      statusDiv.textContent = "⏳ Funding...";
+      await tx.wait();
+      statusDiv.textContent = "✅ Funded successfully!";
+    } catch (err) {
+      statusDiv.textContent = "❌ Fund failed: " + (err.data?.message || err.message);
+    }
+  };
+  
+  withdrawBtn.onclick = async () => {
+    if (!contract) return alert("Please connect your wallet first.");
+    try {
+      const tx = await contract.withdraw();
+      statusDiv.textContent = "⏳ Withdrawing...";
+      await tx.wait();
+      statusDiv.textContent = "✅ Withdrawal successful!";
+    } catch (err) {
+      statusDiv.textContent = "❌ Withdraw failed: " + (err.data?.message || err.message);
+    }
+  };
